@@ -59,7 +59,11 @@ class Cell
 
   def alive?(gen)
     # Use the gen to select the correct bit of history
-    @history[gen] == :alive
+    if gen < @history.size
+      @history[gen] == :alive
+    else
+      # Calculate the new generation
+    end
   end
 
   def position
@@ -71,12 +75,21 @@ end
 class Display
   attr_accessor :x_min, :x_max, :y_min, :y_max
 
-  def initialize(x_min, x_max, y_min, y_max)
+  def initialize(x_min: 0, x_max: 10, y_min: 0, y_max: 10)
     @x_min = x_min
     @x_max = x_max
     @y_min = y_min
     @y_max = y_max
 
+  end
+
+  def display(x, adapter: :basic)
+    case adapter
+    when :basic
+      print x
+    else
+      print x
+    end
   end
 
   def register
@@ -85,13 +98,13 @@ class Display
 end
 
 def main
-  display = Display.new(x_min: 0, x_max: 10, y_min: 0, y_max: 10)
-  board = Board.new(generation_zero: [ [ 1, nil ], [ 1, nil ] ] )
+  display = Display.new
+  board = Board.new    # (generation_zero: [ [ 1, nil ], [ 1, nil ] ] )
 
   generation = 0
   loop do
     generation += 1
-    display board.next(generation,
+    display board.show(generation,
       display_x_min: display.x_min,
       display_x_max: display.x_max,
       display_y_min: display.y_min,
