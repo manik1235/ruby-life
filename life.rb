@@ -69,7 +69,13 @@ class Cell
 
       # Count living neighbors in the generation prior to the generation passed in
       living_neighbors = 0
-      @board.cells[@x - 1][@y - 1]&.alive?
+      [[-1, -1], [-1, 0], [-1, 1],
+       [0, -1], [0, 1],
+       [1, -1], [1, 0], [1, 1],
+      ].reduce(living_neighbors) do |a, v|
+        dx, dy = v
+        a = @board.cells[@x + dx][@y + dy]&.alive? ? 1 : 0 }
+      end
 
 
     end
