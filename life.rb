@@ -1,3 +1,6 @@
+require 'pry'
+
+
 class Board
   attr_accessor :cells # Should probably just be a writer, but I need it to be accessor for debugging
   attr_accessor :generation
@@ -112,3 +115,6 @@ def main
     )
   end
 end
+
+binding.pry
+puts "binding complete"
