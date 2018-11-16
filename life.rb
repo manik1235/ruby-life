@@ -3,14 +3,14 @@ class Board
   attr_accessor :generation
   attr_reader :min_x, :max_x, :min_y, :max_y
 
-  def initialize(generation_zero)
+  def initialize(generation_zero: [ [nil,1,nil],[nil,1,nil],[nil,1,nil] ])
     @generation = 0
     @cells = Hash.new(nil)
     @generation_zero = generation_zero
 
     generation_zero.each_with_index do |xs, x|
       xs.each_with_index do |ys, y|
-        puts "x=#{x}, y=#{y}, status=#{ys ? :alive : :dead}"
+        puts "x=#{x}, y=#{y}, ys=#{ys}" 
         Cell.new(x, y, ys ? :alive : :dead, self)
       end
     end
@@ -40,19 +40,26 @@ class Board
       (display_y_min...display_y_max).to_a.each do |y|
         #return_grid[x][y] = @cells[ [x, y] ]&.alive? ? 1 : nil
 
+        #puts @cells[ [x, y] ]&.alive?
         if @cells[ [x, y] ]&.alive?
-          puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=alive"
+          # puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=alive"
           return_grid[x][y] = 1
+          # puts "rg=#{return_grid[x][y]}"
+          # puts "rg=#{return_grid}"
+
         else
-          puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=dead"
+          #puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=dead"
           # puts "return_grid=#{return_grid}"
           # puts "return_grid[#{x}]=#{return_grid[x]}"
           # puts "return_grid[#{x}][#{y}]=#{return_grid[x][y]}"
-          return_grid[x][y] = 0
+          puts "rg=#{return_grid}"
+          puts "x#{x},yy#{y}"
+          return_grid[x][y] = nil
         end
       end
     end
-
+    # return_grid is getting cleared to zeros before here
+    puts "return_grid outside loop=#{return_grid}"
     return_grid
   end
 end
@@ -72,7 +79,7 @@ class Cell
   end
 
   def alive?
-
+    :true
   end
 
   def position
