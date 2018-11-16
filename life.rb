@@ -66,6 +66,12 @@ class Cell
       @history[gen] == :alive
     else
       # Calculate the new generation
+
+      # Count living neighbors in the generation prior to the generation passed in
+      living_neighbors = 0
+      @board.cells[@x - 1][@y - 1]&.alive?
+
+
     end
   end
 
