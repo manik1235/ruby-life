@@ -10,9 +10,11 @@ class Board
 
     generation_zero.each_with_index do |xs, x|
       xs.each_with_index do |ys, y|
+        puts "x=#{x}, y=#{y}, status=#{ys ? :alive : :dead}"
         Cell.new(x, y, ys ? :alive : :dead, self)
       end
     end
+    # The loop above appears to correctly create a 3x3 grid.
   end
 
   def register(cell)
@@ -29,16 +31,23 @@ class Board
     xs = Array.new(display_x_max - display_x_min)
     return_grid = Array.new((display_y_max - display_y_min), xs)
 
-    (display_x_min..display_x_max).to_a.each do
-      |x| (display_y_min..display_y_max).to_a.each do |y|
+    puts "return_grid.size=#{return_grid.size}; expected to be `10`"
+    puts "return_grid[0].size=#{return_grid[0].size}; expected to be `10`"
+
+    puts
+
+    (display_x_min...display_x_max).to_a.each do |x|
+      (display_y_min...display_y_max).to_a.each do |y|
         #return_grid[x][y] = @cells[ [x, y] ]&.alive? ? 1 : nil
 
         if @cells[ [x, y] ]&.alive?
+          puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=alive"
           return_grid[x][y] = 1
         else
-          puts "return_grid=#{return_grid}"
-          puts "return_grid[#{x}]=#{return_grid[x]}"
-          puts "return_grid[#{x}][#{y}]=#{return_grid[x][y]}"
+          puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=dead"
+          # puts "return_grid=#{return_grid}"
+          # puts "return_grid[#{x}]=#{return_grid[x]}"
+          # puts "return_grid[#{x}][#{y}]=#{return_grid[x][y]}"
           return_grid[x][y] = 0
         end
       end
