@@ -68,23 +68,35 @@ class Cell
       # Calculate the new generation
 
       # Count living neighbors in the generation prior to the generation passed in
-      living_neighbors = 0
-      [[-1, -1], [-1, 0], [-1, 1],
-       [0, -1], [0, 1],
-       [1, -1], [1, 0], [1, 1],
-      ].reduce(living_neighbors) do |a, v|
-        dx, dy = v
-        a = @board.cells[@x + dx][@y + dy]&.alive? ? 1 : 0 }
-      end
-
-
+      neighbors = living_neighbors(gen: (gen - 1))
     end
   end
 
   def position
     [@x, @y]
-
   end
+
+  private
+
+    def living_neighbors(gen: )
+      [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1],
+      ].reduce(0) do |a, v|
+        dx, dy = v
+        puts "v=#{v}, @x=#{@x}, @y=#{@y}"
+        if @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen - 1)
+          a += 1
+        else
+          a
+        end
+        #a += @board.cells[[@x + dx, @y + dy]]&.alive? ? 1 : 0
+        #binding.pry
+        puts "a=#{a}"
+        a
+      end
+    end
 end
 
 class Display
