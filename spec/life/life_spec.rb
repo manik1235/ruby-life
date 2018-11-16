@@ -7,7 +7,7 @@ RSpec.describe "Conway's Game of Life" do
     end
   end
 
-  describe "can create a display" do
+  describe "Display" do
     let(:display) { Display.new(x_min: 0, x_max: 10, y_min: 0, y_max: 10) }
 
     it "is valid" do
@@ -38,8 +38,26 @@ RSpec.describe "Conway's Game of Life" do
         [nil,1,nil],
         [nil,1,nil],
         ])
+    end
+  end
 
+  describe "Cell" do
+    let(:board) { Board.new }
+    let(:cell) { Cell.new(0, 3, :alive, board) }
 
+    it "has correct initial values" do
+      expect(cell.x).to eql(0)
+      expect(cell.y).to eql(3)
+      expect(cell.board).to eql(board)
+      expect(cell.history).to eql([:alive])
+    end
+
+    it "knows it's alive" do
+      expect(cell.alive?(gen: 0)).to eql(true)
+    end
+
+    it "knows it's dead" do
+      expect(cell.alive?(gen: 1)).to eql(false)
     end
   end
 

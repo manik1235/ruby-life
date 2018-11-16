@@ -35,7 +35,7 @@ class Board
 
     (display_x_min..display_x_max).to_a.each do |x|
       (display_y_min..display_y_max).to_a.each do |y|
-        if @cells[ [x, y] ]&.alive?(gen)
+        if @cells[ [x, y] ]&.alive?(gen: gen)
           return_grid[x][y] = 1
         else
           return_grid[x][y] = nil
@@ -60,7 +60,7 @@ class Cell
     board.register self
   end
 
-  def alive?(gen)
+  def alive?(gen: )
     # Use the gen to select the correct bit of history
     if gen < @history.size
       @history[gen] == :alive
