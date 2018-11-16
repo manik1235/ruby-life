@@ -62,14 +62,31 @@ class Cell
 
   def alive?(gen: )
     # Use the gen to select the correct bit of history
-    if gen < @history.size
-      @history[gen] == :alive
-    else
+    if gen >= @history.size
       # Calculate the new generation
 
       # Count living neighbors in the generation prior to the generation passed in
       neighbors = living_neighbors(gen: (gen - 1))
+      if @history[gen - 1] == :alive
+        if neighbors == 2 || neighbors == 3
+          # If the cell was alive in the prior generation, it stays alive with 2 or 3 neighbors, and dies otherwise
+          @history[gen] = :alive
+        else
+          @history[gen] = :dead
+        end
+      else
+        if neighbors == 3
+          # If a cell was dead in the prior generation, it is born if it has 3 neighbors, and stays dead otherwise
+          @history[gen] = :alive
+        else
+          @history[gen] = :dead
+        end
+      end
     end
+
+    # Every history generation <= `gen` should have a state now.
+    #binding.pry
+    @history[gen] == :alive
   end
 
   def position
