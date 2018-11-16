@@ -115,6 +115,3 @@ def main
     )
   end
 end
-
-binding.pry
-puts "binding complete"
