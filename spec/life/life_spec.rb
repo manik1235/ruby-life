@@ -18,4 +18,29 @@ RSpec.describe "Conway's Game of Life" do
     end
   end
 
+  describe "can create a board" do
+    let(:board) { Board.new(
+      generation_zero: [
+        [nil,1,nil],
+        [nil,1,nil],
+        [nil,1,nil],
+      ]) }
+
+    it "#show works" do
+      expect(board.show(
+        gen: 0,
+        display_x_min: 0,
+        display_x_max: 2,
+        display_y_min: 0,
+        display_y_max: 2,
+      )).to eql([
+        [nil,1,nil],
+        [nil,1,nil],
+        [nil,1,nil],
+        ])
+
+
+    end
+  end
+
 end
