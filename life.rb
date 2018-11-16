@@ -32,17 +32,13 @@ class Board
 
     (display_x_min..display_x_max).to_a.each do |x|
       (display_y_min..display_y_max).to_a.each do |y|
-        puts "@cells[ [x, y] ]&.alive?(gen)=#{@cells[ [x, y] ]&.alive?(gen)}"
         if @cells[ [x, y] ]&.alive?(gen)
-          puts "size=#{return_grid.size}"
-          puts "x=#{x}, y=#{y}"
           return_grid[x][y] = 1
         else
-          #return_grid[x][y] = 0
+          return_grid[x][y] = nil
         end
       end
     end
-    # return_grid is getting cleared to zeros before here
     return_grid
   end
 end
