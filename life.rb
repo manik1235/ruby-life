@@ -1,5 +1,5 @@
 class Board
-  attr_writer :cells
+  attr_accessor :cells # Should probably just be a writer, but I need it to be accessor for debugging
   attr_accessor :generation
   attr_reader :min_x, :max_x, :min_y, :max_y
 
@@ -10,7 +10,6 @@ class Board
 
     generation_zero.each_with_index do |xs, x|
       xs.each_with_index do |ys, y|
-        puts "x=#{x}, y=#{y}, ys=#{ys}" 
         Cell.new(x, y, ys ? :alive : :dead, self)
       end
     end
@@ -25,41 +24,25 @@ class Board
     @max_y = cell.y if cell.y > @max_y.to_i
   end
 
-  def next(gen, display_x_min, display_x_max, display_y_min, display_y_max)
+  def show(gen: 0, display_x_min: 0, display_x_max: 2, display_y_min: 0, display_y_max: 2)
     # @generation += 1 # I don't think the board needs to keep track of generations. That can be done externally.
     # return the board as an array of 1 and nil, same as given
-    xs = Array.new(display_x_max - display_x_min)
-    return_grid = Array.new((display_y_max - display_y_min), xs)
+    xs = Array.new(display_x_max - display_x_min + 1)
+    return_grid = Array.new((display_y_max - display_y_min + 1), xs)
 
-    puts "return_grid.size=#{return_grid.size}; expected to be `10`"
-    puts "return_grid[0].size=#{return_grid[0].size}; expected to be `10`"
-
-    puts
-
-    (display_x_min...display_x_max).to_a.each do |x|
-      (display_y_min...display_y_max).to_a.each do |y|
-        #return_grid[x][y] = @cells[ [x, y] ]&.alive? ? 1 : nil
-
-        #puts @cells[ [x, y] ]&.alive?
-        if @cells[ [x, y] ]&.alive?
-          # puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=alive"
+    (display_x_min..display_x_max).to_a.each do |x|
+      (display_y_min..display_y_max).to_a.each do |y|
+        puts "@cells[ [x, y] ]&.alive?(gen)=#{@cells[ [x, y] ]&.alive?(gen)}"
+        if @cells[ [x, y] ]&.alive?(gen)
+          puts "size=#{return_grid.size}"
+          puts "x=#{x}, y=#{y}"
           return_grid[x][y] = 1
-          # puts "rg=#{return_grid[x][y]}"
-          # puts "rg=#{return_grid}"
-
         else
-          #puts "x=#{x}, y=#{y}, @cells[ [#{x}, #{y}] ]=#{@cells[ [x, y] ]}=dead"
-          # puts "return_grid=#{return_grid}"
-          # puts "return_grid[#{x}]=#{return_grid[x]}"
-          # puts "return_grid[#{x}][#{y}]=#{return_grid[x][y]}"
-          puts "rg=#{return_grid}"
-          puts "x#{x},yy#{y}"
-          return_grid[x][y] = nil
+          #return_grid[x][y] = 0
         end
       end
     end
     # return_grid is getting cleared to zeros before here
-    puts "return_grid outside loop=#{return_grid}"
     return_grid
   end
 end
@@ -78,8 +61,9 @@ class Cell
     board.register self
   end
 
-  def alive?
-    :true
+  def alive?(gen)
+    # Use the gen to select the correct bit of history
+    @history[gen] == :alive
   end
 
   def position
