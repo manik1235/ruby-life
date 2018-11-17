@@ -135,10 +135,16 @@ class Display
 
   end
 
-  def display(x, adapter: :basic)
+  def display(matrix, adapter: :basic)
     case adapter
     when :basic
-      x.each { |y| print y.to_s + "\n" }
+      matrix.each { |y| print y.to_s + "\n" }
+    when :ascii
+      matrix.each do |row|
+        row.each do |cell|
+          print cell == 1 ? 1 : 0
+        end
+      end
     else
       print x
     end
