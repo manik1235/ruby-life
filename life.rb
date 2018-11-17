@@ -6,7 +6,7 @@ class Board
   attr_accessor :generation
   attr_reader :min_x, :max_x, :min_y, :max_y
 
-  def initialize(generation_zero: [ [nil,1,nil],[nil,1,nil],[nil,1,nil] ])
+  def initialize(generation_zero: [ [nil,1,nil,nil],[nil,1,nil,nil],[nil,1,nil,nil] ])
     @generation = 0
     @cells = Hash.new(nil)
     @generation_zero = generation_zero
@@ -27,21 +27,29 @@ class Board
     @max_y = cell.y if cell.y > @max_y.to_i
   end
 
-  def show(gen: 0, display_x_min: 0, display_x_max: 2, display_y_min: 0, display_y_max: 2)
-    # @generation += 1 # I don't think the board needs to keep track of generations. That can be done externally.
+  def show(gen: 0, display_x_min: 0, display_x_max: 2, display_y_min: 0, display_y_max: 3)
     # return the board as an array of 1 and nil, same as given
-    xs = Array.new(display_x_max - display_x_min + 1)
-    return_grid = Array.new((display_y_max - display_y_min + 1), xs)
+    delta_x = display_x_max - display_x_min
+    delta_y = display_y_max - display_y_min
+    xs = Array.new(delta_x + 1)
+    return_grid = Array.new((delta_y + 1), xs)
 
-    (display_x_min..display_x_max).to_a.each do |x|
-      (display_y_min..display_y_max).to_a.each do |y|
-        if @cells[ [x, y] ]&.alive?(gen: gen)
-          return_grid[x][y] = 1
+    puts "newly init'd return_grid=#{return_grid}"
+    puts "delta_x=#{delta_x}"
+    puts "delta_y=#{delta_y}"
+    # What does @cells[[3, 3]] equal at this point?
+    return_grid.size
+    (0..delta_x).to_a.each do |x|
+      (0..delta_y).to_a.each do |y|
+        puts "x=#{x}; expected to never be >= 3"
+        if @cells[ [x + display_x_min, y + display_y_min] ]&.alive?(gen: gen)
+          return_grid[y][x] = 1
         else
-          return_grid[x][y] = nil
+          return_grid[y][x] = nil
         end
       end
     end
+    puts "expected return_grid dimensions: 3 across, 4 down."
     return_grid
   end
 end
@@ -83,9 +91,7 @@ class Cell
         end
       end
     end
-
     # Every history generation <= `gen` should have a state now.
-    #binding.pry
     @history[gen] == :alive
   end
 
@@ -102,16 +108,11 @@ class Cell
         [1, -1], [1, 0], [1, 1],
       ].reduce(0) do |a, v|
         dx, dy = v
-        puts "v=#{v}, @x=#{@x}, @y=#{@y}"
         if @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen - 1)
           a += 1
         else
           a
         end
-        #a += @board.cells[[@x + dx, @y + dy]]&.alive? ? 1 : 0
-        #binding.pry
-        puts "a=#{a}"
-        a
       end
     end
 end
@@ -130,7 +131,7 @@ class Display
   def display(x, adapter: :basic)
     case adapter
     when :basic
-      print x
+      x.each { |y| print y.to_s + "\n" }
     else
       print x
     end
@@ -147,12 +148,17 @@ def main
 
   generation = 0
   loop do
-    generation += 1
-    display board.show(generation,
+    puts "\nGeneration #{generation}"
+    display.display board.show(
+      gen: generation,
       display_x_min: display.x_min,
       display_x_max: display.x_max,
       display_y_min: display.y_min,
       display_y_max: display.y_max,
-    )
+    ),
+    adapter: :basic
+    binding.pry
+    sleep 1
+    generation += 1
   end
 end

@@ -37,7 +37,19 @@ RSpec.describe "Conway's Game of Life" do
         [nil,1,nil],
         [nil,1,nil],
         [nil,1,nil],
-        ])
+      ])
+
+      expect(board.show(
+        gen: 0,
+        display_x_min: -1,
+        display_x_max: 1,
+        display_y_min: -1,
+        display_y_max: 1,
+      )).to eql([
+        [nil,nil,nil],
+        [nil,nil,1],
+        [nil,nil,1],
+      ])
     end
   end
 
