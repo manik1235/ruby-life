@@ -13,10 +13,9 @@ class Board
 
     generation_zero.each_with_index do |ys, y|
       ys.each_with_index do |xs, x|
-        Cell.new(x, y, xs ? :alive : :dead, self)
+        Cell.new(x, y, xs ? [:alive] : [:dead], self)
       end
     end
-    # The loop above appears to correctly create a 3x3 grid.
   end
 
   def register(cell)
@@ -25,6 +24,17 @@ class Board
     @max_x = cell.x if cell.x > @max_x.to_i
     @min_y = cell.y if cell.y < @min_y.to_i
     @max_y = cell.y if cell.y > @max_y.to_i
+  end
+
+  def find_or_create_cell(x:, y:, gen:)
+    if @cells[ [ x, y ] ].nil?
+      # If it's nil, its not a cell
+      state = Array.new(gen + 1)
+      state[0] = :dead
+      state[-1] = :dead
+      Cell.new(x, y, state, self)
+    end
+    @cells[ [ x, y ] ]
   end
 
   def show(gen: 0, display_x_min: 0, display_x_max: 2, display_y_min: 0, display_y_max: 3)
@@ -58,7 +68,7 @@ class Cell
   def initialize(x, y, state, board)
     @x = x
     @y = y
-    @history = [state]
+    @history = state.to_a
     @board = board
 
     board.register self
@@ -117,7 +127,12 @@ class Cell
         else
           # Create a new, dead cell if this neighbor doesn't yet exist.
           # # This could be a dangerous assumption...
-          Cell.new(@x + dx, @y + dy, :dead, @board)
+          # This will set the cell's initial state.
+          state = Array.new(gen + 1)
+          state[0] = :dead
+          state[-1] = :dead
+          cell = Cell.new(@x + dx, @y + dy, state, @board)
+          # This will set the cell's history at this point.
           a
         end
       end
@@ -144,14 +159,11 @@ class Display
         row.each do |cell|
           print cell == 1 ? 1 : 0
         end
+        print "\n"
       end
     else
-      print x
+      print matrix
     end
-  end
-
-  def register
-    puts 'Not Implemented: #registered'
   end
 end
 
@@ -179,8 +191,28 @@ def main
       display_y_min: display.y_min,
       display_y_max: display.y_max,
     ),
-    adapter: :basic
-    sleep 1
-    generation += 1
+    adapter: :ascii
+    r = $stdin.gets.chomp
+
+    if r == ""
+      # An empty register just means increase the generation
+      generation += 1
+    elsif r == 'q' || r == 'exit'
+      # TODO: Don't exit pry, too
+      exit
+    elsif r[0] == "g"
+      # format g### to go to that generation
+      new_gen = r.slice(1, r.length - 1).to_i
+      generation = new_gen
+    elsif r[0] == "c" # Set a cell to dead or alive
+      # Format: "c x y s" where s is 1 or 0 for alive or dead
+      _, x, y, s = r.split
+      x = x.to_i
+      y = y.to_i
+      s = s == "1" ? :alive : :dead
+      board.find_or_create_cell(x: x, y: y, gen: generation).history[generation] = s
+    end
+
+
   end
 end
