@@ -107,9 +107,17 @@ class Cell
       ].reduce(0) do |a, v|
         dx, dy = v
         #puts "neighbor(#{@x + dx},#{@y + dy}) reports being alive?=#{true == @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen)} as of gen=#{gen}"
-        if @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen)
-          a += 1
+        # This needs to create a dead neighbor if the @board.cells doesn't respond to #alive?
+        if @board.cells[[@x + dx, @y + dy]].respond_to?(:alive?)
+          if @board.cells[[@x + dx, @y + dy]].alive?(gen: gen)
+            a += 1
+          else
+            a
+          end
         else
+          # Create a new, dead cell if this neighbor doesn't yet exist.
+          # # This could be a dangerous assumption...
+          Cell.new(@x + dx, @y + dy, :dead, @board)
           a
         end
       end
@@ -143,7 +151,16 @@ end
 
 def main
   display = Display.new
-  board = Board.new    # (generation_zero: [ [ 1, nil ], [ 1, nil ] ] )
+  # Basic 3 bar
+  # board = Board.new    # (generation_zero: [ [ 1, nil ], [ 1, nil ] ] )
+
+  # Glider
+  board = Board.new(generation_zero: [
+    [ nil, 1  , nil ],
+    [ nil, nil, 1   ],
+    [ 1  , 1  , 1   ],
+  ])
+
 
   generation = 0
   loop do
