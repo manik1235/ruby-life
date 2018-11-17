@@ -11,9 +11,9 @@ class Board
     @cells = Hash.new(nil)
     @generation_zero = generation_zero
 
-    generation_zero.each_with_index do |xs, x|
-      xs.each_with_index do |ys, y|
-        Cell.new(x, y, ys ? :alive : :dead, self)
+    generation_zero.each_with_index do |ys, y|
+      ys.each_with_index do |xs, x|
+        Cell.new(x, y, xs ? :alive : :dead, self)
       end
     end
     # The loop above appears to correctly create a 3x3 grid.
@@ -31,17 +31,14 @@ class Board
     # return the board as an array of 1 and nil, same as given
     delta_x = display_x_max - display_x_min
     delta_y = display_y_max - display_y_min
-    xs = Array.new(delta_x + 1)
-    return_grid = Array.new((delta_y + 1), xs)
 
-    puts "newly init'd return_grid=#{return_grid}"
-    puts "delta_x=#{delta_x}"
-    puts "delta_y=#{delta_y}"
+    xs = Array.new(delta_x + 1)
+    return_grid = Array.new
+    (delta_y + 1).times { return_grid << xs.dup }
+
     # What does @cells[[3, 3]] equal at this point?
-    return_grid.size
     (0..delta_x).to_a.each do |x|
       (0..delta_y).to_a.each do |y|
-        puts "x=#{x}; expected to never be >= 3"
         if @cells[ [x + display_x_min, y + display_y_min] ]&.alive?(gen: gen)
           return_grid[y][x] = 1
         else
@@ -49,7 +46,6 @@ class Board
         end
       end
     end
-    puts "expected return_grid dimensions: 3 across, 4 down."
     return_grid
   end
 end
