@@ -11,6 +11,14 @@ class Board
     @cells = Hash.new(nil)
     @generation_zero = generation_zero
 
+    # I probably shouldn't assume
+    # it always is zero, but right now
+    # the first cell is always at zero
+    @min_x = 0
+    @max_x = 0
+    @min_y = 0
+    @max_y = 0
+
     generation_zero.each_with_index do |ys, y|
       ys.each_with_index do |xs, x|
         Cell.new(x, y, xs ? [:alive] : [:dead], self)
@@ -150,19 +158,26 @@ class Display
 
   end
 
-  def display(matrix, adapter: :basic)
+  def display(matrix, adapter: :basic, header: "", footer: "")
     case adapter
     when :basic
+      puts header
       matrix.each { |y| print y.to_s + "\n" }
+      puts footer
     when :ascii
+      puts header
       matrix.each do |row|
         row.each do |cell|
           print cell == 1 ? 1 : 0
         end
         print "\n"
       end
+      puts footer
     else
+      puts header
       print matrix
+      puts
+      puts footer
     end
   end
 end
@@ -183,7 +198,11 @@ def main
   generation = 0
   loop do
     system "clear"
-    puts "\nGeneration #{generation}"
+    header = %{
+Generation: #{generation}
+Cell Count: #{board.cells.keys.count}
+x: #{board.min_x}:#{board.max_x}, y: #{board.min_y}:#{board.max_y}
+}
     display.display board.show(
       gen: generation,
       display_x_min: display.x_min,
@@ -191,7 +210,7 @@ def main
       display_y_min: display.y_min,
       display_y_max: display.y_max,
     ),
-    adapter: :ascii
+    adapter: :ascii, header: header, footer: nil
     r = $stdin.gets.chomp
 
     if r == ""
@@ -206,11 +225,15 @@ def main
       generation = new_gen
     elsif r[0] == "c" # Set a cell to dead or alive
       # Format: "c x y s" where s is 1 or 0 for alive or dead
+      # Modifying prior generations is weird.
+      # Maybe wipe out the later history after that?
       _, x, y, s = r.split
       x = x.to_i
       y = y.to_i
       s = s == "1" ? :alive : :dead
       board.find_or_create_cell(x: x, y: y, gen: generation).history[generation] = s
+    elsif r == "pry"
+      binding.pry
     end
 
 
