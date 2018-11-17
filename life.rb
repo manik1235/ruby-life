@@ -68,10 +68,12 @@ class Cell
     # Use the gen to select the correct bit of history
     if gen >= @history.size
       # Calculate the new generation
+      prior_gen = gen - 1
 
-      # Count living neighbors in the generation prior to the generation passed in
-      neighbors = living_neighbors(gen: (gen - 1))
-      if @history[gen - 1] == :alive
+      # Count living neighbors in the generation prior to the generation being asked about.
+      neighbors = living_neighbors(gen: prior_gen)
+      # puts "cell(#{@x},#{@y}) reports neighbors=#{neighbors} as of gen=#{prior_gen}"
+      if @history[prior_gen] == :alive
         if neighbors == 2 || neighbors == 3
           # If the cell was alive in the prior generation, it stays alive with 2 or 3 neighbors, and dies otherwise
           @history[gen] = :alive
@@ -100,11 +102,12 @@ class Cell
     def living_neighbors(gen: )
       [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1], [0, 1],
-        [1, -1], [1, 0], [1, 1],
+        [ 0, -1],          [ 0, 1],
+        [ 1, -1], [ 1, 0], [ 1, 1],
       ].reduce(0) do |a, v|
         dx, dy = v
-        if @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen - 1)
+        #puts "neighbor(#{@x + dx},#{@y + dy}) reports being alive?=#{true == @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen)} as of gen=#{gen}"
+        if @board.cells[[@x + dx, @y + dy]]&.alive?(gen: gen)
           a += 1
         else
           a
@@ -144,6 +147,7 @@ def main
 
   generation = 0
   loop do
+    system "clear"
     puts "\nGeneration #{generation}"
     display.display board.show(
       gen: generation,
@@ -153,7 +157,6 @@ def main
       display_y_max: display.y_max,
     ),
     adapter: :basic
-    binding.pry
     sleep 1
     generation += 1
   end
